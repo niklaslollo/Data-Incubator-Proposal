@@ -1,0 +1,140 @@
+---
+title: "Trends in Hiring using LinkedIn Data 2015-2019"
+author: Niklas Lollo
+date: Sys.Date()
+output: html_document
+---
+# Trends in Hiring
+
++ Which companies are meeting performance goals? 
++ Which ones are growing? Why? 
++ How does hiring growth influence stock price?
+
+This project aims to answer key questions about company performance using LinkedIn job postings and stock prices.
+
+## Key datasets
+
+  + 2 million LinkedIn job postings from 2015-2019 (courtesy of Thinknum via The Data Incubator)
+  + NYSE stock prices over the same time period at 1-day intervals (courtesy of Thinknum via of the Data Incubator)
+
+```{r setup, warning=F, message = F, echo =T}
+knitr::opts_chunk$set(echo = F)
+
+library(tidyverse)
+library(lubridate)
+library(tidytext)
+library(plotly)
+
+# Load data
+dat <- read_csv("../../temp_datalab_records_linkedin_company.csv")
+```
+
+```{r data cleaning, warning=F, message = F, echo =T}
+# Remove & and combine fields
+dat <- dat %>%
+  mutate(
+    industry = str_replace_all(industry, "&", "and"),
+    industry = str_replace_all(industry, "amp;", "")
+  )
+# table(dat$industry)
+```
+
+### Which industry has been growing?
+
+The first image displays the industries that appear to be growing immensely over the data period. It arrives at an industry average by first taking the **ratio of total company job postings to average company employees** for each company in a given industry, then averaging this figure. As the title shows, **Writing and Editing** is growing the most from 2015 to 2019. Very small start-ups (<10 employees) were excluded from this analysis. Further analysis could link this data with industry stock indices to understand trends in hiring practices.
+
+```{r which industries are hiring, message = F, echo = T, include = T}
+# Which industries are best represented in the dataset?
+## 1. Basic: Display count by industry
+dat %>% 
+  count(industry, sort = T, name = "industry_total")
+# Add count to dataset
+dat <- dat %>%
+  add_count(industry, name = "industry_total") %>%
+  add_count(company_name, name = "company_total") %>%
+  add_count(company_name, industry, name = "industry_company_total")
+
+## 2. Proportional by # of employees
+dat <- dat %>%
+  group_by(company_name) %>%
+  mutate(
+    avg_employee_ct = mean(employees_on_platform, na.rm=T)
+  ) %>%
+  ungroup
+
+summary(dat$employees_on_platform)
+# need to filter for startups (<10)
+
+# Suprising number of jobs compared to employees
+surprise <- dat %>%
+  filter(avg_employee_ct >=10) %>%
+  group_by(company_name, industry) %>%
+  mutate(
+    ind_comp_emp_ratio = industry_company_total/avg_employee_ct
+  ) %>%
+  ungroup %>%
+  group_by(industry)%>%
+  summarize(
+    mean_ratio = mean(ind_comp_emp_ratio, na.rm=T)
+  ) %>% ungroup %>%
+  arrange(desc(mean_ratio)) 
+head(surprise)
+# Writing and Editing by far and away the most
+
+# Display
+surprise %>%
+  filter(mean_ratio >7) %>%
+  ggplot() +
+  geom_point(aes(mean_ratio, fct_reorder(industry, mean_ratio))) +
+  theme_classic() +
+  xlab("Ratio of Jobs to Employees") + 
+  theme(axis.title.y = element_blank()) +
+  ggtitle(label = "Writing and Editing is hiring!")
+
+ggsave("images/industry_hiring.png", dpi = 300, width = 7, height = 5)
+```
+### When have companies have had abnormal spikes in hiring?
+
+The second image displays apparel companies of greater than 150 employees that have experienced hiring spikes that were not correlated with industry hiring. The plot shows the percentage difference between **company deviation from average** and **industry deviation from average** job postings. This data is useful to spot particular moments in time when a company appears to be doing better than average. Stock prices and news reports would be helpful to understand **why** these changes occured at this particular point in time. This analysis could be run to see which companies have been doing poorly as well, or any number of filters. It may be useful as a dynamic RShiny application for further interpretation.
+
+The current proposal only displays LinkedIn job postings, but will be crossmatched with NYSE stock prices in the next phase. The code is below.
+
+```{r Over time, echo =T, message=F, include = T}
+#Companies that hire at different times than the rest of their industry
+dat %>%
+  # Company/ industry at particular time
+  add_count(industry, company_name, year(date_added), month(date_added), name= "company_industry_time") %>%
+  # Industry at particular time
+  add_count(industry, year(date_added), month(date_added), name = "industry_time") %>%
+  # Compare difference
+  group_by(company_name, industry) %>%
+  mutate(
+    ind_avg = mean(industry_time, na.rm=T),
+    com_avg = mean(company_industry_time, na.rm=T),
+    pctdiff_from_avg = (company_industry_time - com_avg)/(industry_time - ind_avg) *100
+  ) %>%
+  ungroup -> dat
+
+p<- dat %>%  
+  filter(industry == "Apparel and Fashion" & 
+           pctdiff_from_avg > 25 &
+           avg_employee_ct > 150) %>%
+  ggplot() +
+  geom_point(aes(x = date_added, y= pctdiff_from_avg, color = company_name)) +
+    theme_classic() +
+  ggtitle("Apparel companies that have hiring spikes",
+          subtitle = "Compared to industry average at that time.") +
+  ylab("% diff from avg") +
+  theme(
+    axis.title.x = element_blank(),
+    legend.title = element_blank()
+  )
+
+ggsave(plot = p, filename="images/apparel_companies.png", dpi = 300, width = 7, height = 5)
+
+q <- ggplotly(p)
+q
+# Save
+htmlwidgets::saveWidget(as_widget(q), "apparel_companies.html")
+
+```
