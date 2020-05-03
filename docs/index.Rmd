@@ -3,6 +3,7 @@ title: "Trends in Hiring using LinkedIn Data 2015-2019"
 author: Niklas Lollo
 output: html_document
 theme: jekyll-theme-cayman
+htmlwidgets: TRUE
 ---
 # Trends in Hiring
 
