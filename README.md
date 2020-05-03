@@ -13,3 +13,7 @@ The key datasets are:
 The future output is:
 
   + 
+  
+![Trends](images/industry_hiring.png)
+
+![Apparel Industry](images/apparel_companies.png)
