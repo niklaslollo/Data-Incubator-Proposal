@@ -3,3 +3,4 @@ htmlwidgets: TRUE
 plugins:
   - jekyll-feed
   - jekyll-include-cache
+theme: jekyll-theme-cayman
