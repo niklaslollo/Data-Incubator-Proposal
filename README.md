@@ -21,6 +21,6 @@ The first image displays the industries that appear to be growing immensely over
 
 The second image displays apparel companies of greater than 150 employees that have experienced hiring spikes that were not correlated with industry hiring. The plot shows the percentage difference between **company deviation from average** and **industry deviation from average** job postings. This data is useful to spot particular moments in time when a company appears to be doing better than average. Stock prices and news reports would be helpful to understand **why** these changes occured at this particular point in time. This analysis could be run to see which companies have been doing poorly as well, or any number of filters. It may be useful as a dynamic RShiny application for further interpretation.
 
-![](images/apparel_companies.png)
+![](apparel_companies.html)
 
 The current proposal only displays LinkedIn job postings, but will be crossmatched with NYSE stock prices in the next phase.
