@@ -25,7 +25,7 @@ library(tidytext)
 library(plotly)
 
 # Load data
-dat <- read_csv("../../temp_datalab_records_linkedin_company.csv")
+dat <- read_csv("../temp_datalab_records_linkedin_company.csv")
 ```
 
 ```{r data cleaning, warning=F, message = F, echo =F}
