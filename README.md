@@ -23,4 +23,6 @@ The second image displays apparel companies of greater than 150 employees that h
 
 ![](docs/images/apparel_companies.png)
 
+**Note**: The rmarkdown file in `docs` contains an interactive plotly chart. This is representative of the RShiny application I would like to build.
+
 The current proposal only displays LinkedIn job postings, but will be crossmatched with NYSE stock prices in the next phase.
