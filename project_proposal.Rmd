@@ -13,7 +13,7 @@ library(lubridate)
 library(tidytext)
 
 # Load data
-dat <- read_csv("temp_datalab_records_linkedin_company.csv")
+dat <- read_csv("../temp_datalab_records_linkedin_company.csv")
 ```
 
 ```{r data cleaning}
