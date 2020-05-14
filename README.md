@@ -1,5 +1,3 @@
-# More Effective and Efficient Recruiting
-
 ## Problem
 
 Though 70-80% of jobs come from within a social network (Payscale.com), that still leaves 20-30% of the market opportunities being filled through general job postings on sites like LinkedIn and Indeed. That's what makes LinkedIn data so valuable for recruiters. Recruiters work to make the general job posting market more efficient, by smoothly connecting companies with quality applicants. So recruiters need to be deeply connected to market trends. Many recruiters might be connected to internal hiring schemes, but again, that still leaves 20-30% of the market on the table for upstarts or even well-connected, but data savvy recruiters.
